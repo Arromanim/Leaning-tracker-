@@ -4,7 +4,6 @@
 document.querySelectorAll('.stage-btn').forEach(stageBtn => {
   stageBtn.addEventListener('click', () => {
     const lessons = stageBtn.nextElementSibling;
-    
     lessons.style.display =
       lessons.style.display === 'block' ? 'none' : 'block';
   });
@@ -12,10 +11,10 @@ document.querySelectorAll('.stage-btn').forEach(stageBtn => {
 
 
 /* =====================================
-   NOTES DATA (STAGE 1 – COMPLETE)
+   NOTES DATA (STAGE 1 COMPLETE)
    ===================================== */
 const notes = {
-  
+
   l1: `
 LESSON 1 – CSS SYNTAX & SELECTORS
 
@@ -27,7 +26,7 @@ LESSON 1 – CSS SYNTAX & SELECTORS
 GOLDEN RULE:
 • Styling ke liye class use karo
 `,
-  
+
   l2: `
 LESSON 2 – COLORS & UNITS
 
@@ -40,7 +39,7 @@ GOLDEN RULE:
 • Text = rem
 • Layout = %, fr, vw
 `,
-  
+
   l3: `
 LESSON 3 – BOX MODEL
 
@@ -53,7 +52,7 @@ GOLDEN RULE:
 • Project start me
   box-sizing: border-box lagao
 `,
-  
+
   l4: `
 LESSON 4 – DISPLAY
 
@@ -66,7 +65,7 @@ GOLDEN RULE:
 • Width kaam nahi kare
   to display check karo
 `,
-  
+
   l5: `
 LESSON 5 – OVERFLOW & VISIBILITY
 
@@ -77,6 +76,39 @@ LESSON 5 – OVERFLOW & VISIBILITY
 
 GOLDEN RULE:
 • visibility ≠ display
+`,
+
+  l6: `
+LESSON 6 – POSITIONING
+
+• static → default, no control
+• relative → move hota hai, space rehta hai
+• absolute → normal flow se bahar
+• absolute nearest relative parent follow karta hai
+• fixed → viewport se chipak jata hai
+• sticky → scroll ke baad fixed jaisa
+
+GOLDEN RULE:
+• Absolute use karo
+  to parent relative hona chahiye
+`,
+
+  l7: `
+LESSON 7 – Z-INDEX & STACKING CONTEXT
+
+• z-index overlap order control karta hai
+• z-index tabhi kaam karta hai jab position ho
+• bigger number = upar layer
+• parent ka z-index child ko limit karta hai
+
+STACKING CONTEXT:
+• position + z-index
+• opacity < 1
+• transform / filter
+
+GOLDEN RULE:
+• z-index issue ho
+  to stacking context check karo
 `
 };
 
@@ -99,7 +131,7 @@ let completedLessons =
   JSON.parse(localStorage.getItem('completedLessons')) || [];
 
 
-/* Restore completed lessons on load */
+/* Restore completed lessons on reload */
 completedLessons.forEach(id => {
   const btn = document.querySelector(`[data-note="${id}"]`);
   if (btn) btn.classList.add('active');
@@ -113,16 +145,16 @@ updateProgress();
    ===================================== */
 lessonButtons.forEach(btn => {
   btn.addEventListener('click', () => {
-    
-    /* Active state */
+
+    /* Active lesson highlight */
     lessonButtons.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    
+
     /* Show notes */
     const key = btn.getAttribute('data-note');
-    notesBox.innerText = notes[key];
-    
-    /* Progress update */
+    notesBox.innerText = notes[key] || 'Notes not found';
+
+    /* Update progress */
     if (!completedLessons.includes(key)) {
       completedLessons.push(key);
       localStorage.setItem(
@@ -130,7 +162,7 @@ lessonButtons.forEach(btn => {
         JSON.stringify(completedLessons)
       );
     }
-    
+
     updateProgress();
   });
 });
@@ -143,7 +175,7 @@ function updateProgress() {
   const percent = Math.round(
     (completedLessons.length / totalLessons) * 100
   );
-  
+
   progressFill.style.width = percent + '%';
   completedText.innerHTML =
     `<strong>Completed</strong><br>${percent}%`;
@@ -151,18 +183,18 @@ function updateProgress() {
 
 
 /* =====================================
-   DARK MODE (TOGGLE + MEMORY)
+   DARK MODE (SAFE + MEMORY)
    ===================================== */
 if (localStorage.getItem('darkMode') === 'on') {
   document.body.classList.add('dark');
 }
 
-darkToggle.addEventListener('click', () => {
-  document.body.classList.toggle('dark');
-  
-  if (document.body.classList.contains('dark')) {
-    localStorage.setItem('darkMode', 'on');
-  } else {
-    localStorage.setItem('darkMode', 'off');
-  }
-});
+if (darkToggle) {
+  darkToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+    localStorage.setItem(
+      'darkMode',
+      document.body.classList.contains('dark') ? 'on' : 'off'
+    );
+  });
+}
