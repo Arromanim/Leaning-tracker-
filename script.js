@@ -1,200 +1,78 @@
-/* =====================================
-   STAGE TOGGLE (open / close)
-   ===================================== */
-document.querySelectorAll('.stage-btn').forEach(stageBtn => {
-  stageBtn.addEventListener('click', () => {
-    const lessons = stageBtn.nextElementSibling;
+/* TOGGLE STAGES */
+document.querySelectorAll('.stage-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const lessons = btn.nextElementSibling;
     lessons.style.display =
       lessons.style.display === 'block' ? 'none' : 'block';
   });
 });
 
-
-/* =====================================
-   NOTES DATA (STAGE 1 COMPLETE)
-   ===================================== */
+/* NOTES DATA */
 const notes = {
+  l1: "CSS syntax, element / class / id selectors",
+  l2: "Box model: margin, border, padding, content",
+  l3: "Display: block, inline, inline-block, none",
+  l4: "Overflow & visibility handling",
+  l5: "Position: relative, absolute, fixed, sticky",
 
-  l1: `
-LESSON 1 – CSS SYNTAX & SELECTORS
+  l6: "Flex container, main axis, cross axis",
+  l7: "justify-content & align-items",
 
-• CSS rule = selector + property + value
-• Element selector → p, div, h1
-• Class selector (.) → most used
-• ID selector (#) → unique, limited use
+  l8: "Grid columns, rows, fr unit",
+  l9: "Grid areas & line numbers",
 
-GOLDEN RULE:
-• Styling ke liye class use karo
-`,
+  l10: "Media queries basics",
+  l11: "Responsive flex & grid layouts",
 
-  l2: `
-LESSON 2 – COLORS & UNITS
+  l12: "Font-family, rem, hierarchy",
+  l13: "Line-height & spacing",
 
-• Hex colors (#333, #fff) most common
-• rem → text ke liye best
-• % → parent ke hisaab se
-• vh / vw → viewport based
-
-GOLDEN RULE:
-• Text = rem
-• Layout = %, fr, vw
-`,
-
-  l3: `
-LESSON 3 – BOX MODEL
-
-• Box model order:
-  margin → border → padding → content
-• padding & border size badha dete hain
-• box-sizing: border-box size fix karta hai
-
-GOLDEN RULE:
-• Project start me
-  box-sizing: border-box lagao
-`,
-
-  l4: `
-LESSON 4 – DISPLAY
-
-• block → full width leta hai
-• inline → width / height ignore karta hai
-• inline-block → same line + size allowed
-• none → element + space dono remove
-
-GOLDEN RULE:
-• Width kaam nahi kare
-  to display check karo
-`,
-
-  l5: `
-LESSON 5 – OVERFLOW & VISIBILITY
-
-• overflow: hidden → extra content chhupa deta hai
-• overflow: auto → zarurat par scroll
-• visibility: hidden → invisible, space rehta hai
-• display: none → invisible, space bhi nahi
-
-GOLDEN RULE:
-• visibility ≠ display
-`,
-
-  l6: `
-LESSON 6 – POSITIONING
-
-• static → default, no control
-• relative → move hota hai, space rehta hai
-• absolute → normal flow se bahar
-• absolute nearest relative parent follow karta hai
-• fixed → viewport se chipak jata hai
-• sticky → scroll ke baad fixed jaisa
-
-GOLDEN RULE:
-• Absolute use karo
-  to parent relative hona chahiye
-`,
-
-  l7: `
-LESSON 7 – Z-INDEX & STACKING CONTEXT
-
-• z-index overlap order control karta hai
-• z-index tabhi kaam karta hai jab position ho
-• bigger number = upar layer
-• parent ka z-index child ko limit karta hai
-
-STACKING CONTEXT:
-• position + z-index
-• opacity < 1
-• transform / filter
-
-GOLDEN RULE:
-• z-index issue ho
-  to stacking context check karo
-`
+  l14: "Primary, text, background, surface colors",
+  l15: "Borders, radius, shadow, hover & focus"
 };
 
-
-/* =====================================
-   ELEMENT REFERENCES
-   ===================================== */
-const lessonButtons = document.querySelectorAll('.lesson-btn');
+/* ELEMENTS */
+const lessonBtns = document.querySelectorAll('.lesson-btn');
 const notesBox = document.getElementById('notes-box');
 const progressFill = document.querySelector('.progress-fill');
-const completedText = document.querySelector('.summary div:nth-child(2)');
-const darkToggle = document.getElementById('darkToggle');
 
+/* PROGRESS */
+const total = lessonBtns.length;
+let completed = JSON.parse(localStorage.getItem('completed')) || [];
 
-/* =====================================
-   PROGRESS STATE (AUTO + MEMORY)
-   ===================================== */
-const totalLessons = lessonButtons.length;
-let completedLessons =
-  JSON.parse(localStorage.getItem('completedLessons')) || [];
-
-
-/* Restore completed lessons on reload */
-completedLessons.forEach(id => {
-  const btn = document.querySelector(`[data-note="${id}"]`);
-  if (btn) btn.classList.add('active');
-});
-
-updateProgress();
-
-
-/* =====================================
-   LESSON CLICK HANDLER
-   ===================================== */
-lessonButtons.forEach(btn => {
+lessonBtns.forEach(btn => {
   btn.addEventListener('click', () => {
+    const key = btn.dataset.note;
+    notesBox.innerText = notes[key];
 
-    /* Active lesson highlight */
-    lessonButtons.forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-
-    /* Show notes */
-    const key = btn.getAttribute('data-note');
-    notesBox.innerText = notes[key] || 'Notes not found';
-
-    /* Update progress */
-    if (!completedLessons.includes(key)) {
-      completedLessons.push(key);
-      localStorage.setItem(
-        'completedLessons',
-        JSON.stringify(completedLessons)
-      );
+    if (!completed.includes(key)) {
+      completed.push(key);
+      localStorage.setItem('completed', JSON.stringify(completed));
     }
 
     updateProgress();
   });
 });
 
-
-/* =====================================
-   PROGRESS UPDATE FUNCTION
-   ===================================== */
 function updateProgress() {
-  const percent = Math.round(
-    (completedLessons.length / totalLessons) * 100
-  );
-
+  const percent = Math.round((completed.length / total) * 100);
   progressFill.style.width = percent + '%';
-  completedText.innerHTML =
-    `<strong>Completed</strong><br>${percent}%`;
 }
 
+/* DARK MODE */
+const darkToggle = document.getElementById('darkToggle');
 
-/* =====================================
-   DARK MODE (SAFE + MEMORY)
-   ===================================== */
-if (localStorage.getItem('darkMode') === 'on') {
+if (localStorage.getItem('dark') === 'on') {
   document.body.classList.add('dark');
 }
 
-if (darkToggle) {
-  darkToggle.addEventListener('click', () => {
-    document.body.classList.toggle('dark');
-    localStorage.setItem(
-      'darkMode',
-      document.body.classList.contains('dark') ? 'on' : 'off'
-    );
-  });
-}
+darkToggle.addEventListener('click', () => {
+  document.body.classList.toggle('dark');
+  localStorage.setItem(
+    'dark',
+    document.body.classList.contains('dark') ? 'on' : 'off'
+  );
+});
+
+updateProgress();
+
